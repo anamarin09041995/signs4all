@@ -7,14 +7,14 @@ apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
 
 android {
-    compileSdkVersion 27
+    compileSdkVersion 28
     dataBinding{
         enabled true
     }
     defaultConfig {
         applicationId "unicauca.sing4all"
         minSdkVersion 21
-        targetSdkVersion 27
+        targetSdkVersion 28
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
@@ -28,7 +28,7 @@ android {
     }
 }
 
-def support_version = '27.1.1'
+def support_version = '28.0.0-rc01'
 def dagger_version = '2.16'
 def arch_version = '1.1.1'
 def anko_version = '0.10.4'
@@ -45,7 +45,7 @@ dependencies {
     implementation "com.android.support:recyclerview-v7:$support_version"
     implementation "com.android.support:design:$support_version"
     implementation "com.android.support:cardview-v7:$support_version"
-    implementation 'com.android.support.constraint:constraint-layout:1.1.0'
+    implementation 'com.android.support.constraint:constraint-layout:1.1.2'
 
     //Arch
     implementation "android.arch.lifecycle:extensions:$arch_version"
@@ -58,15 +58,12 @@ dependencies {
     kapt "com.google.dagger:dagger-android-processor:$dagger_version"
 
     //RX
-    implementation 'io.reactivex.rxjava2:rxjava:2.1.12'
+    implementation 'io.reactivex.rxjava2:rxjava:2.2.0'
     implementation 'io.reactivex.rxjava2:rxandroid:2.0.2'
     implementation 'io.reactivex.rxjava2:rxkotlin:2.2.0'
     implementation 'com.jakewharton.rxbinding2:rxbinding-kotlin:2.1.1'
     implementation 'com.jakewharton.rxbinding2:rxbinding-support-v4-kotlin:2.1.1'
     implementation 'com.tbruyelle.rxpermissions2:rxpermissions:0.9.5'
-
-    implementation 'com.squareup.picasso:picasso:2.5.2'
-    kapt 'com.android.databinding:compiler:3.1.2'
 
     //Couchbase
     implementation 'com.couchbase.lite:couchbase-lite-android:2.0.0'
@@ -75,9 +72,6 @@ dependencies {
     implementation 'com.github.bumptech.glide:glide:4.7.1'
     kapt 'com.github.bumptech.glide:compiler:4.7.1'
 
-
-
-    implementation 'com.android.support.constraint:constraint-layout:1.1.0'
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'

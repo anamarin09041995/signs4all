@@ -1,13 +1,11 @@
 package unicauca.sing4all.ui.main
 
 import android.arch.lifecycle.ViewModelProvider
-import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.speech.tts.TextToSpeech
+import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
-import com.bumptech.glide.Glide
 import com.jakewharton.rxbinding2.view.clicks
-import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.activity_main.*
 import org.jetbrains.anko.startActivity
 import unicauca.sing4all.R
@@ -16,7 +14,6 @@ import unicauca.sing4all.ui.adapter.WordAdapter
 import unicauca.sing4all.ui.listen.ListenActivity
 import unicauca.sing4all.util.LifeDisposable
 import unicauca.sing4all.util.buildViewModel
-import java.util.*
 import javax.inject.Inject
 
 class MainActivity : AppCompatActivity(), Injectable {
