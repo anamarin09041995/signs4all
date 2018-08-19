@@ -4,4 +4,9 @@ import android.arch.persistence.room.Entity
 import android.arch.persistence.room.PrimaryKey
 
 @Entity
-class CharConstraint(@PrimaryKey val id:Long, val char:String, val constraint:String)
+class CharConstraint{
+    @PrimaryKey
+    var id:Long = 0
+    lateinit var char:String
+    lateinit var constraint:String
+}
