@@ -7,6 +7,7 @@ import dagger.android.AndroidInjectionModule
 import unicauca.sing4all.App
 import unicauca.sing4all.di.modules.AppModule
 import unicauca.sing4all.di.modules.CouchModule
+import unicauca.sing4all.di.modules.SqlModule
 import unicauca.sing4all.di.modules.ViewModelModule
 import javax.inject.Singleton
 
@@ -16,7 +17,8 @@ import javax.inject.Singleton
     ActivityComponents::class,
     AppModule::class,
     ViewModelModule::class,
-    CouchModule::class
+    CouchModule::class,
+    SqlModule::class
 ])
 interface AppComponent {
 

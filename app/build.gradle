@@ -8,7 +8,7 @@ apply plugin: 'kotlin-kapt'
 
 android {
     compileSdkVersion 28
-    dataBinding{
+    dataBinding {
         enabled true
     }
     defaultConfig {
@@ -50,6 +50,10 @@ dependencies {
     //Arch
     implementation "android.arch.lifecycle:extensions:$arch_version"
     kapt "android.arch.lifecycle:compiler:$arch_version"
+    implementation "android.arch.persistence.room:runtime:$arch_version"
+    kapt "android.arch.persistence.room:compiler:$arch_version"
+    implementation "android.arch.persistence.room:rxjava2:$arch_version"
+    implementation 'com.github.daolq3012:AssetSQLiteOpenHelper:1.0'
 
     //Dagger
     implementation "com.google.dagger:dagger:$dagger_version"
@@ -75,7 +79,6 @@ dependencies {
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
-
 
 
 }

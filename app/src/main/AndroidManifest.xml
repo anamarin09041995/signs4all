@@ -2,7 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="unicauca.sing4all">
 
-    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.INTERNET" />
 
     <application
         android:name=".App"
@@ -19,7 +19,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".ui.listen.ListenActivity"/>
+        <activity android:name=".ui.listen.ListenActivity" />
+        <activity android:name=".ui.setup.SetupActivity"></activity>
     </application>
 
 </manifest>

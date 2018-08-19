@@ -2,6 +2,7 @@ package unicauca.sing4all.di.modules
 
 import android.app.Application
 import android.content.Context
+import android.content.SharedPreferences
 import android.speech.tts.TextToSpeech
 import dagger.Module
 import dagger.Provides
@@ -17,12 +18,15 @@ class AppModule {
 
     @Singleton
     @Provides
-    fun provideText2Speech(context: Context): TextToSpeech{
+    fun provideText2Speech(context: Context): TextToSpeech {
         val txt2Speech = TextToSpeech(context) {}
         txt2Speech.language = Locale.getDefault()
         return txt2Speech
     }
 
-
+    @Singleton
+    @Provides
+    fun providePreferences(context: Context): SharedPreferences =
+            context.getSharedPreferences("sings4all", 0)
 
 }
