@@ -6,4 +6,5 @@
     <color name="imgSign">#333333</color>
     <color name="imgExample">#666666</color>
     <color name="wordBg">#eeeeee</color>
+    <color name="white">#fff</color>
 </resources>

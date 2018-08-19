@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">Sing4All</string>
+    <string name="choose_sorter">Escoja un método de clasificación:</string>
+    <string name="test_mode">Modo de prueba</string>
 </resources>
