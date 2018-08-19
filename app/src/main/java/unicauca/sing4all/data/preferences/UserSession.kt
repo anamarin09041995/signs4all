@@ -12,4 +12,8 @@ class UserSession @Inject constructor(private val preferences: SharedPreferences
         get() = preferences.getString("algorithm", Algorithm.STAGES)!!
         set(value) { preferences.edit().putString("algorithm", value).apply() }
 
+    var testMode: Boolean
+        get() = preferences.getBoolean("testMode", false)
+        set(value) { preferences.edit().putBoolean("testMode", value).apply() }
+
 }
