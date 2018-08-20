@@ -7,7 +7,7 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class StepQuantifier @Inject constructor(private val dao: CharConstraintDao) {
+class StepQuantifier @Inject constructor(private val dao: CharConstraintDao):Quantifier {
 
     private val rangeM: List<Pair<Int, Int>> = listOf(
             8065 to 11591,
@@ -54,7 +54,7 @@ class StepQuantifier @Inject constructor(private val dao: CharConstraintDao) {
             54889 to 67780
     )
 
-    fun calculateChar(hand: Hand): Single<List<String>> = Single.create<String> { emitter ->
+    override fun calculateChar(hand: Hand): Single<List<String>> = Single.create<String> { emitter ->
         val m = rangeM.indexOfFirst { hand.me in it.first until it.second } + 1
         val a = rangeA.indexOfFirst { hand.an in it.first until it.second } + 1
         val c = rangeC.indexOfFirst { hand.co in it.first until it.second } + 1

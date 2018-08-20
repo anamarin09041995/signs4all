@@ -69,6 +69,7 @@ dependencies {
     implementation 'com.jakewharton.rxbinding2:rxbinding-support-v4-kotlin:2.1.1'
     implementation 'com.tbruyelle.rxpermissions2:rxpermissions:0.9.5'
 
+
     //Couchbase
     implementation 'com.couchbase.lite:couchbase-lite-android:2.0.0'
     implementation 'com.fasterxml.jackson.core:jackson-databind:2.9.5'

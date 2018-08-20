@@ -11,13 +11,16 @@ import unicauca.sing4all.data.models.ReportTest
 import unicauca.sing4all.data.preferences.Algorithm
 import unicauca.sing4all.data.preferences.UserSession
 import unicauca.sing4all.quantifier.Hand
+import unicauca.sing4all.quantifier.Quantifier
 import unicauca.sing4all.quantifier.StepQuantifier
+import unicauca.sing4all.quantifier.VectorQuantifier
 import unicauca.sing4all.util.applySchedulers
 import java.io.*
 import java.util.*
 import javax.inject.Inject
 
 class TestViewModel @Inject constructor(private val step: StepQuantifier,
+                                        private val vector:VectorQuantifier,
                                         private val session: UserSession) : ViewModel() {
 
     private lateinit var start: Date
@@ -26,7 +29,7 @@ class TestViewModel @Inject constructor(private val step: StepQuantifier,
 
     fun prepareCsv(file: File, input: InputStream): Single<List<Array<String>>> = Single.create {
 
-        if(!file.exists()){
+        if (!file.exists()) {
             val out = FileOutputStream(file)
             val buffer = ByteArray(1024)
             var read = input.read(buffer)
@@ -42,19 +45,21 @@ class TestViewModel @Inject constructor(private val step: StepQuantifier,
         it.onSuccess(CSVReader(reader).readAll())
     }
 
-    fun test(data:List<Array<String>>): Single<Pair<List<ReportChar>, ReportGlobal>> = when(session.algorithm){
-        Algorithm.STAGES -> testStage(data)
-        else -> testStage(data)
+    fun test(data: List<Array<String>>): Single<Pair<List<ReportChar>, ReportGlobal>> = when (session.algorithm) {
+        Algorithm.STAGES -> testAlg(data, step)
+        Algorithm.VECTORIAL -> testAlg(data, vector)
+        else -> testAlg(data,step)
     }.applySchedulers()
 
-    private fun testStage(data:List<Array<String>>): Single<Pair<List<ReportChar>, ReportGlobal>> = data.toObservable()
-            .filter{!it.contains("")}
-            .map {
-                Hand(it[0].toFloat().toInt(), it[1].toFloat().toInt(), it[2].toFloat().toInt(), it[3].toFloat().toInt(), it[4].toFloat().toInt()) to indexToChar(it[5]) }
-            .doOnNext {start = Date() }
-            .flatMapSingle { Singles.zip(Single.just(it.second), step.calculateChar(it.first)) }
-            .doOnNext {end = Date() }
-            .map {ReportTest(start, end, end.time - start.time, it.second.isNotEmpty() && it.first == it.second[0], it.first, it.second) }
+
+    private fun testAlg(data: List<Array<String>>, alg: Quantifier): Single<Pair<List<ReportChar>, ReportGlobal>> = data.toObservable()
+            .filter { !it.contains("") }
+            .map { arrayOf(it[0].toFloat().toInt(), it[1].toFloat().toInt(), it[2].toFloat().toInt(), it[3].toFloat().toInt(), it[4].toFloat().toInt()) to indexToChar(it[5]) }
+            .map { Hand(it.first[0], it.first[1], it.first[2], it.first[3], it.first[4]) to it.second }
+            .doOnNext { start = Date() }
+            .flatMapSingle { Singles.zip(Single.just(it.second), alg.calculateChar(it.first)) }
+            .doOnNext { end = Date() }
+            .map { ReportTest(start, end, end.time - start.time, it.second.isNotEmpty() && it.first == it.second[0], it.first, it.second) }
             .groupBy { it.charExpected }
             .flatMapSingle {
                 it.reduce(ReportChar(it.key!!)) { a, v ->
