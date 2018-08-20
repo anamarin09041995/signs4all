@@ -45,14 +45,16 @@ class TestViewModel @Inject constructor(private val step: StepQuantifier,
     fun test(data:List<Array<String>>): Single<Pair<List<ReportChar>, ReportGlobal>> = when(session.algorithm){
         Algorithm.STAGES -> testStage(data)
         else -> testStage(data)
-    }
+    }.applySchedulers()
 
     private fun testStage(data:List<Array<String>>): Single<Pair<List<ReportChar>, ReportGlobal>> = data.toObservable()
-            .map { Hand(it[0].toInt(), it[1].toInt(), it[2].toInt(), it[3].toInt(), it[4].toInt()) to indexToChar(it[5]) }
-            .doOnNext { start = Date() }
+            .filter{!it.contains("")}
+            .map {
+                Hand(it[0].toFloat().toInt(), it[1].toFloat().toInt(), it[2].toFloat().toInt(), it[3].toFloat().toInt(), it[4].toFloat().toInt()) to indexToChar(it[5]) }
+            .doOnNext {start = Date() }
             .flatMapSingle { Singles.zip(Single.just(it.second), step.calculateChar(it.first)) }
-            .doOnNext { end = Date() }
-            .map { ReportTest(start, end, end.time - start.time, it.first == it.second[0], it.first, it.second) }
+            .doOnNext {end = Date() }
+            .map {ReportTest(start, end, end.time - start.time, it.second.isNotEmpty() && it.first == it.second[0], it.first, it.second) }
             .groupBy { it.charExpected }
             .flatMapSingle {
                 it.reduce(ReportChar(it.key!!)) { a, v ->
@@ -79,7 +81,7 @@ class TestViewModel @Inject constructor(private val step: StepQuantifier,
                                     a
                                 }
                 )
-            }.applySchedulers()
+            }
 
 
     private fun indexToChar(index: String): String = when (index) {
@@ -104,7 +106,7 @@ class TestViewModel @Inject constructor(private val step: StepQuantifier,
         "18" -> "w"
         "19" -> "x"
         "20" -> "y"
-        else -> " "
+        else -> "_"
     }
 
 

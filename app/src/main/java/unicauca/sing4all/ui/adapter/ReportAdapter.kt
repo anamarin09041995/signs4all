@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import unicauca.sing4all.R
 import unicauca.sing4all.data.models.ReportChar
 import unicauca.sing4all.databinding.TemplateReportBinding
+import unicauca.sing4all.util.inflate
 
 class ReportAdapter:RecyclerView.Adapter<ReportHolder>(){
 
@@ -16,10 +17,8 @@ class ReportAdapter:RecyclerView.Adapter<ReportHolder>(){
          notifyDataSetChanged()
      }
 
-    override fun onCreateViewHolder(p0: ViewGroup, p1: Int): ReportHolder {
-        val view = LayoutInflater.from(p0.context).inflate(R.layout.template_report, p0, false)
-        return ReportHolder(view)
-    }
+    override fun onCreateViewHolder(p0: ViewGroup, p1: Int): ReportHolder  =
+            ReportHolder(p0.inflate(R.layout.template_report))
 
     override fun getItemCount(): Int = data.size
 

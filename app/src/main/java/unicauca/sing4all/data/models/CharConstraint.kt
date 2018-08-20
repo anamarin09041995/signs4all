@@ -7,6 +7,6 @@ import android.arch.persistence.room.PrimaryKey
 class CharConstraint{
     @PrimaryKey
     var id:Long = 0
-    lateinit var char:String
+    lateinit var letter:String
     lateinit var constraint:String
 }

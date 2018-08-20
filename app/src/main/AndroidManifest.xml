@@ -12,7 +12,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".ui.test.TestActivity"
+        <activity android:name=".ui.main.MainActivity"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -22,7 +22,7 @@
         </activity>
         <activity android:name=".ui.listen.ListenActivity" />
         <activity android:name=".ui.setup.SetupActivity" />
-        <activity android:name=".ui.main.MainActivity"></activity>
+        <activity android:name=".ui.test.TestActivity"/>
     </application>
 
 </manifest>

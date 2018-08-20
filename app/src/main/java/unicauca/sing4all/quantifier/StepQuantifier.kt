@@ -14,7 +14,7 @@ class StepQuantifier @Inject constructor(private val dao: CharConstraintDao) {
             11591 to 11895,
             11865 to 17538,
             17538 to 22794,
-            22794 to 23407
+            22794 to 23408
     )
 
     private val rangeA: List<Pair<Int, Int>> = listOf(
@@ -26,13 +26,13 @@ class StepQuantifier @Inject constructor(private val dao: CharConstraintDao) {
             57033 to 69602,
             69602 to 88923,
             88923 to 92970,
-            92970 to 98394
+            92970 to 98395
     )
 
     private val rangeC: List<Pair<Int, Int>> = listOf(
             18147 to 37391,
             37391 to 57033,
-            57033 to 68895
+            57033 to 68896
 
     )
 
@@ -43,7 +43,7 @@ class StepQuantifier @Inject constructor(private val dao: CharConstraintDao) {
             36314 to 48223,
             48223 to 51012,
             51012 to 63303,
-            63303 to 68378
+            63303 to 68379
     )
 
     private val rangeP: List<Pair<Int, Int>> = listOf(
@@ -51,7 +51,7 @@ class StepQuantifier @Inject constructor(private val dao: CharConstraintDao) {
             32258 to 42252,
             42252 to 43346,
             43346 to 54889,
-            54889 to 67779
+            54889 to 67780
     )
 
     fun calculateChar(hand: Hand): Single<List<String>> = Single.create<String> { emitter ->
@@ -62,9 +62,9 @@ class StepQuantifier @Inject constructor(private val dao: CharConstraintDao) {
         val p = rangeP.indexOfFirst { hand.pu in it.first until it.second } + 1
         emitter.onSuccess("$m$a$c$i$p")
     }
-            .flatMap { dao.getChars(it) }
+            .flatMap {dao.getChars(it) }
             .flatMapObservable { it.toObservable() }
-            .map { it.char }
+            .map { it.letter }
             .toList()
 
 
