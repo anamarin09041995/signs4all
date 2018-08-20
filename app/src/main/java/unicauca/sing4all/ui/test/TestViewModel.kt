@@ -13,9 +13,7 @@ import unicauca.sing4all.data.preferences.UserSession
 import unicauca.sing4all.quantifier.Hand
 import unicauca.sing4all.quantifier.StepQuantifier
 import unicauca.sing4all.util.applySchedulers
-import java.io.FileDescriptor
-import java.io.FileReader
-import java.io.InputStream
+import java.io.*
 import java.util.*
 import javax.inject.Inject
 
@@ -26,18 +24,30 @@ class TestViewModel @Inject constructor(private val step: StepQuantifier,
     private lateinit var end: Date
 
 
-    private fun openCsv(fd: FileDescriptor): Single<List<Array<String>>> = Single.create {
-        val reader = FileReader(fd)
+    fun prepareCsv(file: File, input: InputStream): Single<List<Array<String>>> = Single.create {
+
+        if(!file.exists()){
+            val out = FileOutputStream(file)
+            val buffer = ByteArray(1024)
+            var read = input.read(buffer)
+            while (read != -1) {
+                out.write(buffer, 0, read)
+                read = input.read(buffer)
+            }
+            out.close()
+        }
+        input.close()
+
+        val reader = FileReader(file)
         it.onSuccess(CSVReader(reader).readAll())
     }
 
-    fun test(fd: FileDescriptor): Single<Pair<List<ReportChar>, ReportGlobal>> = when(session.algorithm){
-        Algorithm.STAGES -> testStage(fd)
-        else -> testStage(fd)
+    fun test(data:List<Array<String>>): Single<Pair<List<ReportChar>, ReportGlobal>> = when(session.algorithm){
+        Algorithm.STAGES -> testStage(data)
+        else -> testStage(data)
     }
 
-    private fun testStage(fd: FileDescriptor): Single<Pair<List<ReportChar>, ReportGlobal>> = openCsv(fd)
-            .flatMapObservable { it.toObservable() }
+    private fun testStage(data:List<Array<String>>): Single<Pair<List<ReportChar>, ReportGlobal>> = data.toObservable()
             .map { Hand(it[0].toInt(), it[1].toInt(), it[2].toInt(), it[3].toInt(), it[4].toInt()) to indexToChar(it[5]) }
             .doOnNext { start = Date() }
             .flatMapSingle { Singles.zip(Single.just(it.second), step.calculateChar(it.first)) }
