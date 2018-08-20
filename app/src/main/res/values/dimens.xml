@@ -2,4 +2,5 @@
 <resources>
     <dimen name="sign">150dp</dimen>
     <dimen name="example">90dp</dimen>
+    <dimen name="letter">60dp</dimen>
 </resources>

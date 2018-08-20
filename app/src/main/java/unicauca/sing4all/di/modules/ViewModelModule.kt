@@ -8,6 +8,7 @@ import dagger.multibindings.IntoMap
 import unicauca.sing4all.di.ViewModelKey
 import unicauca.sing4all.ui.listen.ListenViewModel
 import unicauca.sing4all.ui.main.MainViewModel
+import unicauca.sing4all.ui.test.TestViewModel
 import unicauca.sing4all.util.AppViewModelFactory
 
 @Module
@@ -27,5 +28,9 @@ abstract class ViewModelModule {
     @ViewModelKey(ListenViewModel::class)
     abstract fun bindListenViewModel(listenViewModel: ListenViewModel): ViewModel
 
+    @Binds
+    @IntoMap
+    @ViewModelKey(TestViewModel::class)
+    abstract fun bindTestViewModel(testViewModel: TestViewModel): ViewModel
 
 }

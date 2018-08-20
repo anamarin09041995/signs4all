@@ -1,15 +1,20 @@
 package unicauca.sing4all.ui.main
 
 import android.arch.lifecycle.ViewModelProvider
+import android.content.Intent
+import android.databinding.generated.callback.OnClickListener
 import android.os.Bundle
 import android.speech.tts.TextToSpeech
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
+import android.widget.Toast
 import com.jakewharton.rxbinding2.view.clicks
 import kotlinx.android.synthetic.main.activity_main.*
 import org.jetbrains.anko.startActivity
+import org.jetbrains.anko.toast
 import unicauca.sing4all.R
 import unicauca.sing4all.di.Injectable
 import unicauca.sing4all.ui.adapter.WordAdapter
@@ -63,13 +68,11 @@ class MainActivity : AppCompatActivity(), Injectable {
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.toolbar_setting, menu)
-        return true
+        return super.onCreateOptionsMenu(menu)
     }
 
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
-        when(item!!.itemId){
-            R.id.configure_toolbar -> startActivity<SetupActivity>()
-        }
+        startActivity<SetupActivity>()
 
         return super.onOptionsItemSelected(item)
     }
