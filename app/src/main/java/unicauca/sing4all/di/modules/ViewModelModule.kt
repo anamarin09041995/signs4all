@@ -33,5 +33,4 @@ abstract class ViewModelModule {
     @ViewModelKey(TestViewModel::class)
     abstract fun bindTestViewModel(testViewModel: TestViewModel): ViewModel
 
-
 }
