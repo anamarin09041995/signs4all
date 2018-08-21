@@ -5,17 +5,48 @@ import io.reactivex.Observable
 import io.reactivex.Single
 import unicauca.sing4all.data.couch.CouchRx
 import unicauca.sing4all.data.models.Word
+import unicauca.sing4all.data.preferences.Algorithm
+import unicauca.sing4all.data.preferences.UserSession
+import unicauca.sing4all.quantifier.BothQuantifier
+import unicauca.sing4all.quantifier.Hand
+import unicauca.sing4all.quantifier.StepQuantifier
+import unicauca.sing4all.quantifier.VectorQuantifier
 import unicauca.sing4all.util.applySchedulers
 import unicauca.sing4all.util.likeEx
 import javax.inject.Inject
 
-class ListenViewModel @Inject constructor(private val db: CouchRx) : ViewModel() {
+class ListenViewModel @Inject constructor(private val db: CouchRx,
+                                          private val step: StepQuantifier,
+                                          private val vector: VectorQuantifier,
+                                          private val both: BothQuantifier,
+                                          private val session: UserSession) : ViewModel() {
 
-    fun queryWords(word: String): Single<List<Word>> {
+    var word: String = ""
+
+    fun queryWords(): Single<List<Word>> {
         val query = if (word == "") "" else "$word%"
         return db.listByExp("text" likeEx query, Word::class)
-                .applySchedulers()
     }
 
+    fun calculateWord(hand: Hand): Single<Pair<String, List<Word>>> = when (session.algorithm) {
+        Algorithm.VECTORIAL -> vector.calculateChar(hand)
+        Algorithm.STAGES -> step.calculateChar(hand)
+        Algorithm.BOTH -> both.calculateChar(hand)
+        else -> step.calculateChar(hand)
+    }
+            .flatMap {
+                word += if (it.isNotEmpty()) it[0] else ""
+                queryWords()
+            }
+            .map { word to it  }
+            .applySchedulers()
 
+
+    fun clearWord() {
+        word = ""
+    }
 }
+
+
+
+

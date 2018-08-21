@@ -45,12 +45,12 @@ class ListenActivity : AppCompatActivity(), Injectable {
                     textToSpeech.speak(it.text, TextToSpeech.QUEUE_FLUSH, null, null)
                 }
 
-        dis add sign.textChanges()
+        /*dis add sign.textChanges()
                 .flatMapSingle {
                     viewModel.queryWords(it.toString())}
                 .subscribe {
                     adapter.data = it
-                }
+                }*/
 
         dis add btnStop.clicks()
                 .subscribe {
