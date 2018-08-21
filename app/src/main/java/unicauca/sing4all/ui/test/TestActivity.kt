@@ -42,7 +42,8 @@ class TestActivity : AppCompatActivity(), Injectable {
         title = when(session.algorithm){
             Algorithm.STAGES -> "Escalar"
             Algorithm.NEURONAL -> "Neuronal"
-            else -> "Vectorial"
+            Algorithm.VECTORIAL -> "Vectorial"
+            else -> "Combinado"
         }
 
         binding = DataBindingUtil.setContentView(this, R.layout.activity_test)

@@ -8,6 +8,8 @@ import unicauca.sing4all.R
 import unicauca.sing4all.data.models.ReportChar
 import unicauca.sing4all.databinding.TemplateReportBinding
 import unicauca.sing4all.util.inflate
+import java.math.RoundingMode
+import java.text.DecimalFormat
 
 class ReportAdapter:RecyclerView.Adapter<ReportHolder>(){
 
@@ -31,8 +33,16 @@ class ReportAdapter:RecyclerView.Adapter<ReportHolder>(){
 class ReportHolder(view:View):RecyclerView.ViewHolder(view){
 
     private val binding:TemplateReportBinding = TemplateReportBinding.bind(view)
+    val format:DecimalFormat = DecimalFormat("#.###")
+    init{
+        format.roundingMode = RoundingMode.CEILING
+    }
 
     fun bind(report:ReportChar){
         binding.report = report
+        binding.successInfo = format.format(report.successProbability)
+        binding.timeInfo = format.format(report.time)
+        binding.timeAInfo = format.format(report.timeAverage)
+
     }
 }

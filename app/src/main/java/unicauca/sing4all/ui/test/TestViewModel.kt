@@ -10,10 +10,7 @@ import unicauca.sing4all.data.models.ReportGlobal
 import unicauca.sing4all.data.models.ReportTest
 import unicauca.sing4all.data.preferences.Algorithm
 import unicauca.sing4all.data.preferences.UserSession
-import unicauca.sing4all.quantifier.Hand
-import unicauca.sing4all.quantifier.Quantifier
-import unicauca.sing4all.quantifier.StepQuantifier
-import unicauca.sing4all.quantifier.VectorQuantifier
+import unicauca.sing4all.quantifier.*
 import unicauca.sing4all.util.applySchedulers
 import java.io.*
 import java.util.*
@@ -21,8 +18,8 @@ import javax.inject.Inject
 
 class TestViewModel @Inject constructor(private val step: StepQuantifier,
                                         private val vector:VectorQuantifier,
+                                        private val both:BothQuantifier,
                                         private val session: UserSession) : ViewModel() {
-
     private lateinit var start: Date
     private lateinit var end: Date
 
@@ -48,8 +45,14 @@ class TestViewModel @Inject constructor(private val step: StepQuantifier,
     fun test(data: List<Array<String>>): Single<Pair<List<ReportChar>, ReportGlobal>> = when (session.algorithm) {
         Algorithm.STAGES -> testAlg(data, step)
         Algorithm.VECTORIAL -> testAlg(data, vector)
+        Algorithm.BOTH -> testAlg(data, both)
         else -> testAlg(data,step)
     }.applySchedulers()
+
+
+
+
+
 
 
     private fun testAlg(data: List<Array<String>>, alg: Quantifier): Single<Pair<List<ReportChar>, ReportGlobal>> = data.toObservable()
@@ -111,7 +114,7 @@ class TestViewModel @Inject constructor(private val step: StepQuantifier,
         "18" -> "w"
         "19" -> "x"
         "20" -> "y"
-        else -> "_"
+        else -> "es"
     }
 
 

@@ -53,6 +53,8 @@ class SetupActivity : AppCompatActivity(), Injectable {
                 .subscribe { session.algorithm = Algorithm.VECTORIAL }
         dis add radioButton3.clicks()
                 .subscribe { session.algorithm = Algorithm.STAGES }
+        dis add radioButton4.clicks()
+                .subscribe { session.algorithm = Algorithm.BOTH }
 
 
     }
