@@ -50,11 +50,6 @@ class TestViewModel @Inject constructor(private val step: StepQuantifier,
     }.applySchedulers()
 
 
-
-
-
-
-
     private fun testAlg(data: List<Array<String>>, alg: Quantifier): Single<Pair<List<ReportChar>, ReportGlobal>> = data.toObservable()
             .filter { !it.contains("") }
             .map { arrayOf(it[0].toFloat().toInt(), it[1].toFloat().toInt(), it[2].toFloat().toInt(), it[3].toFloat().toInt(), it[4].toFloat().toInt()) to indexToChar(it[5]) }
@@ -116,6 +111,5 @@ class TestViewModel @Inject constructor(private val step: StepQuantifier,
         "20" -> "y"
         else -> "es"
     }
-
 
 }
