@@ -66,6 +66,4 @@ class StepQuantifier @Inject constructor(private val dao: CharConstraintDao):Qua
             .flatMapObservable { it.toObservable() }
             .map { it.letter }
             .toList()
-
-
 }

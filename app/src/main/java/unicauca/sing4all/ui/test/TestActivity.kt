@@ -61,9 +61,9 @@ class TestActivity : AppCompatActivity(), Injectable {
 
         list.adapter = adapter
 
-        val csv = File(ContextCompat.getDataDir(this), "test.csv")
+        val csv = File(ContextCompat.getDataDir(this), "testb.csv")
 
-        dis add viewModel.prepareCsv(csv,assets.open("datasets/test.csv") )
+        dis add viewModel.prepareCsv(csv,assets.open("datasets/testPrePro.csv") )
                 .flatMap(viewModel::test)
                 .subscribe { res ->
                     binding.global = res.second
