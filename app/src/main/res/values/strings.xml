@@ -5,4 +5,5 @@
     <string name="total_time">Tiempo Total</string>
     <string name="time_average">Tiempo Promedio</string>
     <string name="success_probability">Probabilidad de Exito</string>
+    <string name="none_paired">No paired</string>
 </resources>
