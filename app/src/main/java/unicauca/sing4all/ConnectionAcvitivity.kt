@@ -21,6 +21,9 @@ import android.view.View
 import android.widget.*
 import kotlinx.android.synthetic.main.activity_connection_acvitivity.*
 import okio.Utf8
+import org.jetbrains.anko.startActivity
+import unicauca.sing4all.ui.main.MainActivity
+import unicauca.sing4all.ui.setup.SetupActivity
 import java.io.IOException
 import java.io.InputStream
 import java.io.OutputStream
@@ -33,17 +36,10 @@ class ConnectionAcvitivity: AppCompatActivity() {
 
     // GUI Components
     private var mBluetoothStatus: TextView? = null
-    private var mReadBuffer: TextView? = null
-    private var mScanBtn: Button? = null
-    private var mOffBtn: Button? = null
-    private var mListPairedDevicesBtn: Button? = null
-    private val mDiscoverBtn: Button? = null
     private var mBTAdapter: BluetoothAdapter? = null
     private var mPairedDevices: Set<BluetoothDevice>? = null
     private var mBTArrayAdapter: ArrayAdapter<String>? = null
     private var mDevicesListView: ListView? = null
-    private var mLED1: CheckBox? = null
-
     private val TAG = ConnectionAcvitivity::class.java.simpleName
     private var mHandler: Handler? = null // Our main handler that will receive callback notifications
     private var mConnectedThread: ConnectedThread? = null // bluetooth background worker thread to send and receive data
@@ -126,7 +122,6 @@ class ConnectionAcvitivity: AppCompatActivity() {
         discover()
         scan.setOnClickListener { bluetoothOn() }
         off.setOnClickListener{bluetoothOff()}
-        write.setOnClickListener { mConnectedThread!!.write("hola") }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -161,8 +156,9 @@ class ConnectionAcvitivity: AppCompatActivity() {
                 }
 
                 if (msg.what == CONNECTING_STATUS) {
-                    if (msg.arg1 == 1)
+                    if (msg.arg1 == 1){
                         bluetoothStatus.text = "Connected to Device: " + msg.obj as String
+                        startActivity<MainActivity>()}
                     else
                         bluetoothStatus.text = "Connection Failed"
                 }

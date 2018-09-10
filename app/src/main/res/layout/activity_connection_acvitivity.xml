@@ -93,14 +93,6 @@
                 android:layout_toEndOf="@+id/PairedBtn"
                 android:layout_toRightOf="@+id/PairedBtn" />
 
-            <Button
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Bluetooth WRITE"
-                android:id="@+id/write"
-                android:layout_alignBottom="@+id/scan"
-                android:layout_toEndOf="@+id/PairedBtn"
-                android:layout_toRightOf="@+id/PairedBtn" />
             <ListView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
