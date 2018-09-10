@@ -6,4 +6,9 @@
     <string name="time_average">Tiempo Promedio</string>
     <string name="success_probability">Probabilidad de Exito</string>
     <string name="none_paired">No paired</string>
+
+    <string name="listen">Interpretando ...</string>
+    <string name="no_listen">Interpretar</string>
+    <string name="action_task">UX Task</string>
+    <string name="action_no_task">Normal</string>
 </resources>

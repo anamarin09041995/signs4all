@@ -1,4 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="url_sync">ws://10.0.2.2:4984/words</string>
+    <string name="url_sync">ws://192.168.0.15:4984/words</string>
 </resources>

@@ -1,94 +1,147 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".ui.listen.ListenActivity">
+    xmlns:tools="http://schemas.android.com/tools">
 
-    <TextView
-        android:id="@+id/listening"
-        android:layout_width="0dp"
-        android:layout_height="70dp"
-        android:background="@color/colorAccent"
-        android:gravity="center"
-        android:text="Escuchando ..."
-        android:textAppearance="@style/TextAppearance.AppCompat.Title.Inverse"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.538"
-        app:layout_constraintStart_toStartOf="parent" />
+    <data>
 
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/btnStop"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
-        android:layout_marginEnd="16dp"
-        android:layout_marginTop="8dp"
-        android:clickable="true"
-        android:tint="@color/colorAccent"
-        app:backgroundTint="@color/cardview_light_background"
-        app:fabSize="normal"
-        app:layout_constraintBottom_toBottomOf="@+id/listening"
-        app:layout_constraintEnd_toEndOf="@+id/listening"
-        app:layout_constraintTop_toTopOf="@+id/listening"
-        app:srcCompat="@drawable/ic_hand" />
+        <import type="android.view.View" />
 
-    <EditText
-        android:id="@+id/sign"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="8dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="10dp"
-        android:ems="10"
-        android:inputType="textCapSentences"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        <variable
+            name="letters"
+            type='java.util.List&lt;String>' />
 
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/list"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:layout_marginTop="8dp"
-        app:layout_constraintBottom_toTopOf="@+id/listening"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/btnChar1" />
+        <variable
+            name="listen"
+            type="boolean" />
+    </data>
 
-    <Button
-        android:id="@+id/btnChar1"
-        style="@style/Widget.AppCompat.Button.Borderless.Colored"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="A"
-        app:layout_constraintEnd_toStartOf="@+id/btnChar2"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/sign" />
+    <android.support.constraint.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context=".ui.listen.ListenActivity">
 
-    <Button
-        android:id="@+id/btnChar2"
-        style="@style/Widget.AppCompat.Button.Borderless.Colored"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="B"
-        app:layout_constraintBottom_toBottomOf="@+id/btnChar1"
-        app:layout_constraintEnd_toStartOf="@+id/btnChar3"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toEndOf="@+id/btnChar1" />
+        <TextView
+            android:id="@+id/listening"
+            android:layout_width="0dp"
+            android:layout_height="45dp"
+            android:background="@{listen ? @color/colorAccent :@color/listen_off}"
+            android:gravity="center"
+            android:text="@{listen ? @string/listen : @string/no_listen}"
+            android:textAppearance="@style/TextAppearance.AppCompat.Title.Inverse"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.538"
+            app:layout_constraintStart_toStartOf="parent" />
 
-    <Button
-        android:id="@+id/btnChar3"
-        style="@style/Widget.AppCompat.Button.Borderless.Colored"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="C"
-        app:layout_constraintBottom_toBottomOf="@+id/btnChar2"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toEndOf="@+id/btnChar2" />
+        <ImageView
+            android:id="@+id/btnPlay"
+            android:layout_width="35dp"
+            android:layout_height="35dp"
+            android:layout_marginEnd="16dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:clickable="true"
+            android:focusable="true"
+            android:visibility="@{listen ? View.GONE : View.VISIBLE}"
+            app:layout_constraintBottom_toBottomOf="@+id/listening"
+            app:layout_constraintEnd_toEndOf="@+id/listening"
+            app:layout_constraintTop_toTopOf="@+id/listening"
+            app:srcCompat="@drawable/ic_play" />
 
-</android.support.constraint.ConstraintLayout>
+        <ImageView
+            android:id="@+id/btnStop"
+            android:layout_width="35dp"
+            android:layout_height="35dp"
+            android:layout_marginEnd="16dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:clickable="true"
+            android:focusable="true"
+            android:visibility="@{listen ? View.VISIBLE : View.GONE}"
+            app:layout_constraintBottom_toBottomOf="@+id/listening"
+            app:layout_constraintEnd_toEndOf="@+id/listening"
+            app:layout_constraintTop_toTopOf="@+id/listening"
+            app:srcCompat="@drawable/ic_clear" />
+
+        <EditText
+            android:id="@+id/sign"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="10dp"
+            android:ems="10"
+            android:enabled="@{!listen}"
+            android:inputType="textCapSentences"
+            android:textSize="30sp"
+            app:layout_constraintEnd_toStartOf="@+id/btnClear"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/list"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginTop="8dp"
+            app:layout_constraintBottom_toTopOf="@+id/listening"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/btnChar1" />
+
+        <Button
+            android:id="@+id/btnChar1"
+            android:textColor="@color/white"
+            tools:text="a"
+            style="@style/Widget.AppCompat.Button.Colored"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="@{letters[0]}"
+            android:visibility="@{ letters.size > 0 ? View.VISIBLE : View.INVISIBLE }"
+            app:layout_constraintEnd_toStartOf="@+id/btnChar2"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/sign" />
+
+        <Button
+            android:id="@+id/btnChar2"
+            android:textColor="@color/white"
+            tools:text="a"
+            style="@style/Widget.AppCompat.Button.Colored"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="@{letters[1]}"
+            android:visibility="@{ letters.size > 1 ? View.VISIBLE : View.INVISIBLE }"
+            app:layout_constraintBottom_toBottomOf="@+id/btnChar1"
+            app:layout_constraintEnd_toStartOf="@+id/btnChar3"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toEndOf="@+id/btnChar1" />
+
+        <Button
+            android:id="@+id/btnChar3"
+            android:textColor="@color/white"
+            tools:text="a"
+            style="@style/Widget.AppCompat.Button.Colored"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="@{letters[2]}"
+            android:visibility="@{ letters.size > 2 ? View.VISIBLE : View.INVISIBLE }"
+            app:layout_constraintBottom_toBottomOf="@+id/btnChar2"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toEndOf="@+id/btnChar2" />
+
+        <ImageView
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:clickable="true"
+            android:focusable="true"
+            android:id="@+id/btnClear"
+            android:layout_width="@dimen/clear"
+            android:layout_height="@dimen/clear"
+            android:layout_marginBottom="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginTop="8dp"
+            app:layout_constraintBottom_toTopOf="@+id/btnChar3"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/ic_clear_dark" />
+
+    </android.support.constraint.ConstraintLayout>
+</layout>

@@ -3,6 +3,8 @@
     <color name="colorPrimary">#c2185b</color>
     <color name="colorPrimaryDark">#b30c4d</color>
     <color name="colorAccent">#cddc39</color>
+    <color name="listen_off">#777</color>
+
     <color name="imgSign">#333333</color>
     <color name="imgExample">#666666</color>
     <color name="wordBg">#eeeeee</color>

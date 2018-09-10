@@ -23,8 +23,13 @@ class ListenViewModel @Inject constructor(private val db: CouchRx,
 
     var word: String = ""
 
-    fun queryWords(): Single<List<Word>> {
+    private fun queryWords(): Single<List<Word>> {
         val query = if (word == "") "" else "$word%"
+        return db.listByExp("text" likeEx query, Word::class)
+    }
+
+    fun queryWords(w:String): Single<List<Word>> {
+        val query = if (w== "") "" else "$w%"
         return db.listByExp("text" likeEx query, Word::class)
     }
 
@@ -41,6 +46,12 @@ class ListenViewModel @Inject constructor(private val db: CouchRx,
             .map { word to it  }
             .applySchedulers()
 
+    fun calculateLetter(hand:Hand):Single<List<String>> = when (session.algorithm) {
+        Algorithm.VECTORIAL -> vector.calculateChar(hand)
+        Algorithm.STAGES -> step.calculateChar(hand)
+        Algorithm.BOTH -> both.calculateChar(hand)
+        else -> step.calculateChar(hand)
+    }.applySchedulers()
 
     fun clearWord() {
         word = ""

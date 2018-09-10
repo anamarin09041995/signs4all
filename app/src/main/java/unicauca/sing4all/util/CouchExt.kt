@@ -2,6 +2,7 @@ package unicauca.sing4all.util
 
 import com.couchbase.lite.ArrayFunction
 import com.couchbase.lite.Expression
+import com.couchbase.lite.Function
 import java.util.*
 
 // EQUAL TO
@@ -29,8 +30,8 @@ infix fun String.lt(value: Any): Expression = Expression.property(this)
 infix fun String.lte(value: Any): Expression = Expression.property(this)
         .lessThanOrEqualTo(makeExpressionValue(value))
 // LIKE
-infix fun String.likeEx(value: String): Expression = Expression.property(this)
-        .like(Expression.string(value))
+infix fun String.likeEx(value: String): Expression = Function.lower(Expression.property(this))
+        .like(Expression.string(value.toLowerCase()))
 
 // LOGICAL
 infix fun Expression.andEx(expression: Expression):Expression = this.and(expression)
