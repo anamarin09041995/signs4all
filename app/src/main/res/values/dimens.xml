@@ -3,4 +3,7 @@
     <dimen name="sign">150dp</dimen>
     <dimen name="example">90dp</dimen>
     <dimen name="letter">60dp</dimen>
+    <dimen name="activity_horizontal_margin">16dp</dimen>
+    <dimen name="activity_vertical_margin">16dp</dimen>
+
 </resources>
