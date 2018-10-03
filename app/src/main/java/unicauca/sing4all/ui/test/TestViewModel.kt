@@ -2,29 +2,27 @@ package unicauca.sing4all.ui.test
 
 import android.arch.lifecycle.ViewModel
 import com.opencsv.CSVReader
-import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.rxkotlin.Singles
-import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.rxkotlin.toObservable
 import unicauca.sing4all.data.models.ReportChar
 import unicauca.sing4all.data.models.ReportGlobal
 import unicauca.sing4all.data.models.ReportTest
-import unicauca.sing4all.data.models.ReportTestNN
-import unicauca.sing4all.data.net.NNApi
-import unicauca.sing4all.data.net.ResponseNN
 import unicauca.sing4all.data.preferences.Algorithm
 import unicauca.sing4all.data.preferences.UserSession
 import unicauca.sing4all.quantifier.*
 import unicauca.sing4all.util.applySchedulers
-import java.io.*
+import java.io.File
+import java.io.FileOutputStream
+import java.io.FileReader
+import java.io.InputStream
 import java.util.*
 import javax.inject.Inject
 
 class TestViewModel @Inject constructor(private val step: StepQuantifier,
                                         private val vector:VectorQuantifier,
                                         private val both:BothQuantifier,
-                                        private val client:NNApi,
+                                        private val neural:NeuralNet,
                                         private val session: UserSession) : ViewModel() {
     private lateinit var start: Date
     private lateinit var end: Date
@@ -52,56 +50,11 @@ class TestViewModel @Inject constructor(private val step: StepQuantifier,
         Algorithm.STAGES -> testAlg(data, step)
         Algorithm.VECTORIAL -> testAlg(data, vector)
         Algorithm.BOTH -> testAlg(data, both)
-        else -> testNN(data)
+        else -> testAlg(data, neural)
     }.applySchedulers()
 
 
 
-
-
-    private fun testNN(data: List<Array<String>>): Single<Pair<List<ReportChar>, ReportGlobal>> = data.toObservable()
-            .filter { !it.contains("") }
-            .map { arrayOf(it[0].toFloat(), it[2].toFloat(), it[3].toFloat(), it[4].toFloat()) to indexToChar(it[5]) }
-            .map { HandNN(it.first[0], it.first[2], it.first[3], it.first[4]) to it.second }
-            .doOnNext { start = Date() }
-            .flatMapSingle {
-                Singles.zip(Single.just(it.second), testNN(it.first.me,it.first.co,it.first.ind,it.first.pu) )}
-            .doOnNext { end = Date() }
-            .map {
-                ReportTestNN(start, end, end.time - start.time, it.second.isNotEmpty() && it.first == it.second, it.first, it.second) }
-            .groupBy { it.charExpected }
-            .flatMapSingle {
-                it.reduce(ReportChar(it.key!!)) { a, v ->
-                    a.count += 1
-                    if (v.success) a.success += 1
-                    else a.fail += 1
-                    a.time += v.duration
-                    a.timeAverage = a.time.toDouble() / a.count
-                    a.successProbability = a.success.toFloat() / (a.success + a.fail)
-                    a
-                }
-            }
-            .toList()
-            .flatMap {
-                Singles.zip(Single.just(it),
-                        it.toObservable()
-                                .reduce(ReportGlobal()) { a, v ->
-                                    a.count += 1
-                                    a.success += v.success
-                                    a.fail += v.fail
-                                    a.time += v.time
-                                    a.timeAverage = a.time.toDouble() / a.count
-                                    a.successProbability = a.success.toFloat() / (a.success + a.fail)
-                                    a
-                                }
-                )
-            }
-
-
-    private fun testNN(menique:Float,medio:Float,indice:Float,pulgar:Float):Single<String> =
-            client.getResponseNN(menique,medio,indice,pulgar).map {
-                it.result!!
-            }.applySchedulers()
 
 
     private fun testAlg(data: List<Array<String>>, alg: Quantifier): Single<Pair<List<ReportChar>, ReportGlobal>> = data.toObservable()
