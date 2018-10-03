@@ -5,6 +5,8 @@ import io.reactivex.Observable
 import io.reactivex.Single
 import unicauca.sing4all.data.couch.CouchRx
 import unicauca.sing4all.data.models.Word
+import unicauca.sing4all.data.net.NNApi
+import unicauca.sing4all.data.net.ResponseNN
 import unicauca.sing4all.data.preferences.Algorithm
 import unicauca.sing4all.data.preferences.UserSession
 import unicauca.sing4all.quantifier.BothQuantifier
@@ -16,6 +18,7 @@ import unicauca.sing4all.util.likeEx
 import javax.inject.Inject
 
 class ListenViewModel @Inject constructor(private val db: CouchRx,
+                                          private  val client: NNApi,
                                           private val step: StepQuantifier,
                                           private val vector: VectorQuantifier,
                                           private val both: BothQuantifier,
@@ -32,6 +35,14 @@ class ListenViewModel @Inject constructor(private val db: CouchRx,
         val query = if (w== "") "" else "$w%"
         return db.listByExp("text" likeEx query, Word::class)
     }
+
+    fun NeuralNNResult(menique:Float,medio:Float,indice:Float,pulgar:Float):Single<ResponseNN> =
+        client.getResponseNN(menique,medio,indice,pulgar).map {
+            it
+        }.applySchedulers()
+
+
+
 
     fun calculateWord(hand: Hand): Single<Pair<String, List<Word>>> = when (session.algorithm) {
         Algorithm.VECTORIAL -> vector.calculateChar(hand)

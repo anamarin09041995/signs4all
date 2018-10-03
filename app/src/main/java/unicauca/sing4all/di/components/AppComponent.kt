@@ -9,6 +9,7 @@ import unicauca.sing4all.di.modules.AppModule
 import unicauca.sing4all.di.modules.CouchModule
 import unicauca.sing4all.di.modules.SqlModule
 import unicauca.sing4all.di.modules.ViewModelModule
+import unicauca.sing4all.di.modules.net.NetModule
 import javax.inject.Singleton
 
 @Singleton
@@ -18,7 +19,8 @@ import javax.inject.Singleton
     AppModule::class,
     ViewModelModule::class,
     CouchModule::class,
-    SqlModule::class
+    SqlModule::class,
+    NetModule::class
 ])
 interface AppComponent {
 

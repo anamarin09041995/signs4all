@@ -2,6 +2,7 @@ package unicauca.sing4all.di.components
 
 import dagger.Module
 import dagger.android.ContributesAndroidInjector
+import unicauca.sing4all.ConnectionAcvitivity
 import unicauca.sing4all.di.ActivityScope
 import unicauca.sing4all.ui.listen.ListenActivity
 import unicauca.sing4all.ui.main.MainActivity
@@ -27,6 +28,9 @@ abstract class ActivityComponents{
     @ContributesAndroidInjector()
     abstract fun bindSetUpActivity(): SetupActivity
 
+    @ActivityScope
+    @ContributesAndroidInjector()
+    abstract fun bindConnectionActivity():ConnectionAcvitivity
 
 
 }

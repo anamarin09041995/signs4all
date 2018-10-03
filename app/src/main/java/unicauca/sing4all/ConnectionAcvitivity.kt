@@ -5,10 +5,7 @@ import android.app.Activity
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothSocket
-import android.content.BroadcastReceiver
-import android.content.Context
-import android.content.Intent
-import android.content.IntentFilter
+import android.content.*
 import android.content.pm.PackageManager
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
@@ -22,19 +19,22 @@ import android.widget.*
 import kotlinx.android.synthetic.main.activity_connection_acvitivity.*
 import okio.Utf8
 import org.jetbrains.anko.startActivity
+import unicauca.sing4all.data.models.BluetoothSession
+import unicauca.sing4all.di.Injectable
 import unicauca.sing4all.ui.main.MainActivity
 import unicauca.sing4all.ui.setup.SetupActivity
+import unicauca.sing4all.util.save
 import java.io.IOException
 import java.io.InputStream
 import java.io.OutputStream
 import java.io.UnsupportedEncodingException
 import java.nio.charset.Charset
 import java.util.*
+import javax.inject.Inject
 
 
-class ConnectionAcvitivity: AppCompatActivity() {
+class ConnectionAcvitivity: AppCompatActivity(),Injectable {
 
-    // GUI Components
     private var mBluetoothStatus: TextView? = null
     private var mBTAdapter: BluetoothAdapter? = null
     private var mPairedDevices: Set<BluetoothDevice>? = null
@@ -44,6 +44,9 @@ class ConnectionAcvitivity: AppCompatActivity() {
     private var mHandler: Handler? = null // Our main handler that will receive callback notifications
     private var mConnectedThread: ConnectedThread? = null // bluetooth background worker thread to send and receive data
     private var mBTSocket: BluetoothSocket? = null // bi-directional client-to-client data path
+
+    @Inject
+    lateinit var bluetoothSession: BluetoothSession
 
     internal val blReceiver: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
@@ -68,46 +71,10 @@ class ConnectionAcvitivity: AppCompatActivity() {
         val info = (v as TextView).text.toString()
         val address = info.substring(info.length - 17)
         val name = info.substring(0, info.length - 17)
+        bluetoothSession.address = address
+        startActivity<MainActivity>()
 
-        // Spawn a new thread to avoid blocking the GUI one
-        object : Thread() {
-            override fun run() {
-                var fail = false
 
-                val device = mBTAdapter!!.getRemoteDevice(address)
-
-                try {
-                    mBTSocket = createBluetoothSocket(device)
-                } catch (e: IOException) {
-                    fail = true
-                    Toast.makeText(baseContext, "Socket creation failed", Toast.LENGTH_SHORT).show()
-                }
-
-                // Establish the Bluetooth socket connection.
-                try {
-                    mBTSocket!!.connect()
-                } catch (e: IOException) {
-                    try {
-                        fail = true
-                        mBTSocket!!.close()
-                        mHandler!!.obtainMessage(CONNECTING_STATUS, -1, -1)
-                                .sendToTarget()
-                    } catch (e2: IOException) {
-                        //insert code to deal with this
-                        Toast.makeText(baseContext, "Socket creation failed", Toast.LENGTH_SHORT).show()
-                    }
-
-                }
-
-                if (fail == false) {
-                    mConnectedThread = ConnectedThread(mBTSocket!!)
-                    mConnectedThread!!.start()
-
-                    mHandler!!.obtainMessage(CONNECTING_STATUS, 1, -1, name)
-                            .sendToTarget()
-                }
-            }
-        }.start()
     }
 
 
@@ -140,33 +107,7 @@ class ConnectionAcvitivity: AppCompatActivity() {
         // Ask for location permission if not already allowed
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED)
             ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION), 1)
-
-
-        mHandler = object : Handler() {
-            override fun handleMessage(msg: android.os.Message) {
-                if (msg.what == MESSAGE_READ) {
-                    var readMessage: String? = null
-                    try {
-                        readMessage = String(msg.obj as ByteArray,Charsets.UTF_8)
-                    } catch (e: UnsupportedEncodingException) {
-                        e.printStackTrace()
-                    }
-
-                    readBuffer.text = readMessage
-                }
-
-                if (msg.what == CONNECTING_STATUS) {
-                    if (msg.arg1 == 1){
-                        bluetoothStatus.text = "Connected to Device: " + msg.obj as String
-                        startActivity<MainActivity>()}
-                    else
-                        bluetoothStatus.text = "Connection Failed"
-                }
-            }
-        }
-
-
-    }
+ }
 
      fun bluetoothOn() {
         if (!mBTAdapter!!.isEnabled) {
@@ -232,6 +173,7 @@ class ConnectionAcvitivity: AppCompatActivity() {
     @Throws(IOException::class)
     private fun createBluetoothSocket(device: BluetoothDevice): BluetoothSocket {
         try {
+
             val m = device.javaClass.getMethod("createInsecureRfcommSocketToServiceRecord", UUID::class.java)
             return m.invoke(device, BTMODULEUUID) as BluetoothSocket
         } catch (e: Exception) {
@@ -312,7 +254,7 @@ class ConnectionAcvitivity: AppCompatActivity() {
 
         private val BTMODULEUUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB") // "random" unique identifier
 
-
+         val   BTADDRESS = "device"
         // #defines for identifying shared types between calling functions
         private val REQUEST_ENABLE_BT = 1 // used to identify adding bluetooth names
         private val MESSAGE_READ = 2 // used in bluetooth handler to identify message update

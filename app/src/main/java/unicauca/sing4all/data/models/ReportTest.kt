@@ -9,6 +9,13 @@ class ReportTest(val init: Date,
                  val charExpected:String,
                  val result:List<String> )
 
+class ReportTestNN(val init: Date,
+                   val end:Date,
+                   val duration:Long,
+                   val success:Boolean,
+                   val charExpected:String,
+                   val result:String)
+
 class ReportChar(val letter:String,
                  var time:Long = 0,
                  var success:Int = 0,
