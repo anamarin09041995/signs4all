@@ -68,9 +68,6 @@ class ListenActivity : AppCompatActivity(), Injectable {
     @Inject
     lateinit var uxTask: ListenTask
 
-    @Inject
-    lateinit var bluetoothAddress : BluetoothSession
-
     val dis: LifeDisposable = LifeDisposable(this)
     var uxDis: Disposable? = null
 
@@ -84,7 +81,9 @@ class ListenActivity : AppCompatActivity(), Injectable {
             sign?.setText(value)
         }
 
-
+    //region BTComponents
+    @Inject
+    lateinit var bluetoothAddress : BluetoothSession
     private var mBluetoothStatus: TextView? = null
     private var mBTAdapter: BluetoothAdapter? = null
     private var mBTArrayAdapter: ArrayAdapter<String>? = null
@@ -106,8 +105,9 @@ class ListenActivity : AppCompatActivity(), Injectable {
         }
     }
 
+    //endregion
 
-
+    //region FuncionClickonDevice
     private val mDeviceClickListener = AdapterView.OnItemClickListener { av, v, arg2, arg3 ->
         if (!mBTAdapter!!.isEnabled) {
             Toast.makeText(baseContext, "Bluetooth not on", Toast.LENGTH_SHORT).show()
@@ -161,7 +161,7 @@ class ListenActivity : AppCompatActivity(), Injectable {
         }.start()
     }
 
-
+    //endregion
 
 
 
@@ -180,41 +180,7 @@ class ListenActivity : AppCompatActivity(), Injectable {
         list.layoutManager = LinearLayoutManager(this)
 
 
-      /*  mBTAdapter = BluetoothAdapter.getDefaultAdapter() // get a handle on the bluetooth radio
-
-       // mDevicesListView = findViewById<View>(R.id.devicesListView) as ListView
-        mDevicesListView!!.adapter = mBTArrayAdapter // assign model to view
-        mDevicesListView!!.onItemClickListener = mDeviceClickListener
-
-        // Ask for location permission if not already allowed
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED)
-            ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION), 1)
-
-
-        mHandler = object : Handler() {
-            override fun handleMessage(msg: android.os.Message) {
-                if (msg.what == MESSAGE_READ) {
-                    var readMessage: String? = null
-                    try {
-                        readMessage = String(msg.obj as ByteArray,Charsets.UTF_8)
-                    } catch (e: UnsupportedEncodingException) {
-                        e.printStackTrace()
-                    }
-
-                    readBuffer.text = readMessage
-                }
-
-                if (msg.what == CONNECTING_STATUS) {
-                    if (msg.arg1 == 1){
-                        bluetoothStatus.text = "Connected to Device: " + msg.obj as String
-                        startActivity<MainActivity>()}
-                    else
-                        bluetoothStatus.text = "Connection Failed"
-                }
-            }
-        }
-
-   */ }
+    }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.listen_menu, menu)

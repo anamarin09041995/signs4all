@@ -4,6 +4,7 @@ import android.arch.lifecycle.ViewModel
 import com.opencsv.CSVReader
 import io.reactivex.Single
 import io.reactivex.rxkotlin.Singles
+import io.reactivex.rxkotlin.toFlowable
 import io.reactivex.rxkotlin.toObservable
 import unicauca.sing4all.data.models.ReportChar
 import unicauca.sing4all.data.models.ReportGlobal
@@ -57,7 +58,7 @@ class TestViewModel @Inject constructor(private val step: StepQuantifier,
 
 
 
-    private fun testAlg(data: List<Array<String>>, alg: Quantifier): Single<Pair<List<ReportChar>, ReportGlobal>> = data.toObservable()
+    private fun testAlg(data: List<Array<String>>, alg: Quantifier): Single<Pair<List<ReportChar>, ReportGlobal>> = data.toFlowable()
             .filter { !it.contains("") }
             .map { arrayOf(it[0].toFloat().toInt(), it[1].toFloat().toInt(), it[2].toFloat().toInt(), it[3].toFloat().toInt(), it[4].toFloat().toInt()) to indexToChar(it[5]) }
             .map { Hand(it.first[0], it.first[1], it.first[2], it.first[3], it.first[4]) to it.second }
@@ -81,7 +82,7 @@ class TestViewModel @Inject constructor(private val step: StepQuantifier,
             .toList()
             .flatMap {
                 Singles.zip(Single.just(it),
-                        it.toObservable()
+                        it.toFlowable()
                                 .reduce(ReportGlobal()) { a, v ->
                                     a.count += 1
                                     a.success += v.success
