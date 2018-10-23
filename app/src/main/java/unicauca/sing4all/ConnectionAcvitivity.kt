@@ -40,11 +40,7 @@ class ConnectionAcvitivity: AppCompatActivity(),Injectable {
     private var mPairedDevices: Set<BluetoothDevice>? = null
     private var mBTArrayAdapter: ArrayAdapter<String>? = null
     private var mDevicesListView: ListView? = null
-    private val TAG = ConnectionAcvitivity::class.java.simpleName
     private var mHandler: Handler? = null // Our main handler that will receive callback notifications
-    private var mConnectedThread: ConnectedThread? = null // bluetooth background worker thread to send and receive data
-    private var mBTSocket: BluetoothSocket? = null // bi-directional client-to-client data path
-
     @Inject
     lateinit var bluetoothSession: BluetoothSession
 
@@ -71,6 +67,7 @@ class ConnectionAcvitivity: AppCompatActivity(),Injectable {
         val info = (v as TextView).text.toString()
         val address = info.substring(info.length - 17)
         val name = info.substring(0, info.length - 17)
+        bluetoothSession.name = name
         bluetoothSession.address = address
         startActivity<MainActivity>()
 
@@ -170,19 +167,6 @@ class ConnectionAcvitivity: AppCompatActivity(),Injectable {
             Toast.makeText(applicationContext, "Bluetooth not on", Toast.LENGTH_SHORT).show()
     }
 
-    @Throws(IOException::class)
-    private fun createBluetoothSocket(device: BluetoothDevice): BluetoothSocket {
-        try {
-
-            val m = device.javaClass.getMethod("createInsecureRfcommSocketToServiceRecord", UUID::class.java)
-            return m.invoke(device, BTMODULEUUID) as BluetoothSocket
-        } catch (e: Exception) {
-            Log.e(TAG, "Could not create Insecure RFComm Connection", e)
-        }
-
-        return device.createRfcommSocketToServiceRecord(BTMODULEUUID)
-    }
-
     private inner class ConnectedThread(private val mmSocket: BluetoothSocket) : Thread() {
         private val mmInStream: InputStream?
         private val mmOutStream: OutputStream?
@@ -229,25 +213,7 @@ class ConnectionAcvitivity: AppCompatActivity(),Injectable {
             }
         }
 
-        /* Call this from the main activity to send data to the remote device */
-        fun write(input: String) {
 
-            val bytes = input.toByteArray()           //converts entered String into bytes
-            try {
-                mmOutStream!!.write(bytes)
-            } catch (e: IOException) {
-            }
-
-        }
-
-        /* Call this from the main activity to shutdown the connection */
-        fun cancel() {
-            try {
-                mmSocket.close()
-            } catch (e: IOException) {
-            }
-
-        }
     }
 
     companion object {

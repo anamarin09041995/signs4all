@@ -13,8 +13,6 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.SystemClock
 import android.speech.tts.TextToSpeech
-import android.support.v4.app.ActivityCompat
-import android.support.v4.content.ContextCompat
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
 import android.util.Log
@@ -28,21 +26,13 @@ import io.reactivex.disposables.Disposable
 import io.reactivex.rxkotlin.subscribeBy
 import kotlinx.android.synthetic.main.activity_connection_acvitivity.*
 import kotlinx.android.synthetic.main.activity_listen.*
-import org.jetbrains.anko.startActivity
-import org.jetbrains.anko.support.v4.toast
 import org.jetbrains.anko.toast
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 import unicauca.sing4all.ConnectionAcvitivity
 import unicauca.sing4all.Manifest
 import unicauca.sing4all.R
-import unicauca.sing4all.data.models.BluetoothSession
-import unicauca.sing4all.data.net.ResponseNN
 import unicauca.sing4all.databinding.ActivityListenBinding
 import unicauca.sing4all.di.Injectable
 import unicauca.sing4all.ui.adapter.WordListenAdapter
-import unicauca.sing4all.ui.main.MainActivity
 import unicauca.sing4all.util.LifeDisposable
 import unicauca.sing4all.util.buildViewModel
 import java.io.IOException
@@ -58,7 +48,7 @@ class ListenActivity : AppCompatActivity(), Injectable {
     @Inject
     lateinit var factory: ViewModelProvider.Factory
     val viewModel: ListenViewModel by lazy { buildViewModel<ListenViewModel>(factory) }
-
+    private val btAddress: String by lazy { viewModel.getBtSession() }
     @Inject
     lateinit var adapter: WordListenAdapter
 
@@ -82,85 +72,55 @@ class ListenActivity : AppCompatActivity(), Injectable {
         }
 
     //region BTComponents
-    @Inject
-    lateinit var bluetoothAddress : BluetoothSession
-    private var mBluetoothStatus: TextView? = null
     private var mBTAdapter: BluetoothAdapter? = null
-    private var mBTArrayAdapter: ArrayAdapter<String>? = null
-    private var mDevicesListView: ListView? = null
     private val TAG = ConnectionAcvitivity::class.java.simpleName
     private var mHandler: Handler? = null // Our main handler that will receive callback notifications
     private var mConnectedThread: ConnectedThread? = null // bluetooth background worker thread to send and receive data
     private var mBTSocket: BluetoothSocket? = null // bi-directional client-to-client data path
 
-    internal val blReceiver: BroadcastReceiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context, intent: Intent) {
-            val action = intent.action
-            if (BluetoothDevice.ACTION_FOUND == action) {
-                val device = intent.getParcelableExtra<BluetoothDevice>(BluetoothDevice.EXTRA_DEVICE)
-                // add the name to the list
-                mBTArrayAdapter!!.add(device.name + "\n" + device.address)
-                mBTArrayAdapter!!.notifyDataSetChanged()
-            }
-        }
-    }
-
     //endregion
 
-    //region FuncionClickonDevice
-    private val mDeviceClickListener = AdapterView.OnItemClickListener { av, v, arg2, arg3 ->
-        if (!mBTAdapter!!.isEnabled) {
-            Toast.makeText(baseContext, "Bluetooth not on", Toast.LENGTH_SHORT).show()
-            return@OnItemClickListener
-        }
+    //region FuncionCreateBTThread
+    fun threadBT( address: String){
+    object : Thread() {
+        override fun run() {
+            var fail = false
 
-        bluetoothStatus.text = "Connecting..."
-        // Get the device MAC address, which is the last 17 chars in the View
-        val info = (v as TextView).text.toString()
-        val address = info.substring(info.length - 17)
-        val name = info.substring(0, info.length - 17)
+            val device = mBTAdapter!!.getRemoteDevice(address)
 
-        // Spawn a new thread to avoid blocking the GUI one
-        object : Thread() {
-            override fun run() {
-                var fail = false
+            try {
+                mBTSocket = createBluetoothSocket(device)
+            } catch (e: IOException) {
+                fail = true
+                Toast.makeText(baseContext, "Socket creation failed", Toast.LENGTH_SHORT).show()
+            }
 
-                val device = mBTAdapter!!.getRemoteDevice(address)
-
+            // Establish the Bluetooth socket connection.
+            try {
+                mBTSocket!!.connect()
+            } catch (e: IOException) {
                 try {
-                    mBTSocket = createBluetoothSocket(device)
-                } catch (e: IOException) {
                     fail = true
+                    mBTSocket!!.close()
+                    mHandler!!.obtainMessage(CONNECTING_STATUS, -1, -1)
+                            .sendToTarget()
+                } catch (e2: IOException) {
+                    //insert code to deal with this
                     Toast.makeText(baseContext, "Socket creation failed", Toast.LENGTH_SHORT).show()
                 }
 
-                // Establish the Bluetooth socket connection.
-                try {
-                    mBTSocket!!.connect()
-                } catch (e: IOException) {
-                    try {
-                        fail = true
-                        mBTSocket!!.close()
-                        mHandler!!.obtainMessage(CONNECTING_STATUS, -1, -1)
-                                .sendToTarget()
-                    } catch (e2: IOException) {
-                        //insert code to deal with this
-                        Toast.makeText(baseContext, "Socket creation failed", Toast.LENGTH_SHORT).show()
-                    }
-
-                }
-
-                if (fail == false) {
-                    mConnectedThread = ConnectedThread(mBTSocket!!)
-                    mConnectedThread!!.start()
-
-                    mHandler!!.obtainMessage(CONNECTING_STATUS, 1, -1, name)
-                            .sendToTarget()
-                }
             }
-        }.start()
-    }
 
+            if (!fail) {
+                mConnectedThread = ConnectedThread(mBTSocket!!)
+                mConnectedThread!!.start()
+
+                mHandler!!.obtainMessage(CONNECTING_STATUS, 1, -1, name)
+                        .sendToTarget()
+            }
+        }
+    }.start()
+}
     //endregion
 
 
@@ -168,6 +128,7 @@ class ListenActivity : AppCompatActivity(), Injectable {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        mBTAdapter = BluetoothAdapter.getDefaultAdapter() // get a handle on the bluetooth radio
         binding = DataBindingUtil.setContentView(this, R.layout.activity_listen)
 
         title = "Traductor"
@@ -179,29 +140,30 @@ class ListenActivity : AppCompatActivity(), Injectable {
         list.adapter = adapter
         list.layoutManager = LinearLayoutManager(this)
 
+        //Here is message from arduino
+        mHandler = object : Handler() {
+            override fun handleMessage(msg: android.os.Message) {
+                if (msg.what == MESSAGE_READ) {
+                    var readMessage: String? = null
+                    try {
+                        readMessage = String(msg.obj as ByteArray, Charsets.UTF_8)
+                        Log.e("Datos",readMessage)
+                    } catch (e: UnsupportedEncodingException) {
+                        e.printStackTrace()
+                    }
 
+
+                }
+
+                if (msg.what == CONNECTING_STATUS) {
+                    Log.e("Conectado", "Successfull")
+                }
+            }
+        }
     }
-
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.listen_menu, menu)
         return super.onCreateOptionsMenu(menu)
-    }
-
-    private fun discover() {
-        // Check if the device is already discovering
-        if (mBTAdapter!!.isDiscovering) {
-            mBTAdapter!!.cancelDiscovery()
-            Toast.makeText(applicationContext, "Discovery stopped", Toast.LENGTH_SHORT).show()
-        } else {
-            if (mBTAdapter!!.isEnabled) {
-                mBTArrayAdapter!!.clear() // clear items
-                mBTAdapter!!.startDiscovery()
-                Toast.makeText(applicationContext, "Discovery started", Toast.LENGTH_SHORT).show()
-                registerReceiver(blReceiver, IntentFilter(BluetoothDevice.ACTION_FOUND))
-            } else {
-                Toast.makeText(applicationContext, "Bluetooth not on", Toast.LENGTH_SHORT).show()
-            }
-        }
     }
 
 
@@ -239,6 +201,7 @@ class ListenActivity : AppCompatActivity(), Injectable {
     override fun onResume() {
 
         super.onResume()
+        threadBT(btAddress)
 
         dis add  viewModel.NeuralNNResult(16603f,64373f,35285f,51752f).
                         subscribeBy(onSuccess = {
@@ -247,16 +210,7 @@ class ListenActivity : AppCompatActivity(), Injectable {
                                 onError = {
                                     toast(it.message!!)})
 
-      //DATOSS !!//16603f,64373f,35285f,51752f)
 
-  /*      if (mBTArrayAdapter == null) {
-            // Device does not support Bluetooth
-            mBluetoothStatus!!.text = "Status: Bluetooth not found"
-            Toast.makeText(applicationContext, "Bluetooth device not found!", Toast.LENGTH_SHORT).show()
-        }
-
-        discover()
-*/
         dis add adapter.onClick
                 .subscribe {
                     textToSpeech.speak(it.text, TextToSpeech.QUEUE_FLUSH, null, null)
@@ -351,10 +305,6 @@ class ListenActivity : AppCompatActivity(), Injectable {
     }
 
 
-
-
-
-
     private inner class ConnectedThread(private val mmSocket: BluetoothSocket) : Thread() {
         private val mmInStream: InputStream?
         private val mmOutStream: OutputStream?
@@ -376,7 +326,7 @@ class ListenActivity : AppCompatActivity(), Injectable {
         }
 
         override fun run() {
-            var buffer = ByteArray(1024)  // buffer store for the stream
+            var buffer: ByteArray  // buffer store for the stream
             var bytes: Int // bytes returned from read()
             // Keep listening to the InputStream until an exception occurs
             while (true) {
@@ -388,10 +338,6 @@ class ListenActivity : AppCompatActivity(), Injectable {
                         SystemClock.sleep(100) //pause and wait for rest of data. Adjust this depending on your sending speed.
                         // how many bytes are ready to be read?
                         bytes = mmInStream.read(buffer) // record how many bytes we actually read
-
-
-
-                        //
                         Log.d("Datos", bytes.toString() + "")
                         mHandler!!.obtainMessage(MESSAGE_READ, bytes, -1, buffer)
                                 .sendToTarget() // Send the obtained bytes to the UI activity

@@ -4,6 +4,7 @@ import android.arch.lifecycle.ViewModel
 import io.reactivex.Observable
 import io.reactivex.Single
 import unicauca.sing4all.data.couch.CouchRx
+import unicauca.sing4all.data.models.BluetoothSession
 import unicauca.sing4all.data.models.Word
 import unicauca.sing4all.data.net.NNApi
 import unicauca.sing4all.data.net.ResponseNN
@@ -22,7 +23,14 @@ class ListenViewModel @Inject constructor(private val db: CouchRx,
                                           private val step: StepQuantifier,
                                           private val vector: VectorQuantifier,
                                           private val both: BothQuantifier,
-                                          private val session: UserSession) : ViewModel() {
+                                          private val session: UserSession,
+                                          private val bluetoothSession: BluetoothSession) : ViewModel() {
+
+    private val addressBt = bluetoothSession.address
+    fun getBtSession():String = addressBt
+
+    private val nameBt = bluetoothSession.name
+    fun  getBtName():String = nameBt
 
     var word: String = ""
 
