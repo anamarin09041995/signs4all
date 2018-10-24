@@ -10,10 +10,7 @@ import unicauca.sing4all.data.net.NNApi
 import unicauca.sing4all.data.net.ResponseNN
 import unicauca.sing4all.data.preferences.Algorithm
 import unicauca.sing4all.data.preferences.UserSession
-import unicauca.sing4all.quantifier.BothQuantifier
-import unicauca.sing4all.quantifier.Hand
-import unicauca.sing4all.quantifier.StepQuantifier
-import unicauca.sing4all.quantifier.VectorQuantifier
+import unicauca.sing4all.quantifier.*
 import unicauca.sing4all.util.applySchedulers
 import unicauca.sing4all.util.likeEx
 import javax.inject.Inject
@@ -22,6 +19,7 @@ class ListenViewModel @Inject constructor(private val db: CouchRx,
                                           private  val client: NNApi,
                                           private val step: StepQuantifier,
                                           private val vector: VectorQuantifier,
+                                          private val neuralNet: NeuralNet,
                                           private val both: BothQuantifier,
                                           private val session: UserSession,
                                           private val bluetoothSession: BluetoothSession) : ViewModel() {
@@ -69,7 +67,7 @@ class ListenViewModel @Inject constructor(private val db: CouchRx,
         Algorithm.VECTORIAL -> vector.calculateChar(hand)
         Algorithm.STAGES -> step.calculateChar(hand)
         Algorithm.BOTH -> both.calculateChar(hand)
-        else -> step.calculateChar(hand)
+        else -> neuralNet.calculateChar(hand)
     }.applySchedulers()
 
     fun clearWord() {

@@ -11,5 +11,5 @@
     <string name="no_listen">Interpretar</string>
     <string name="action_task">UX Task</string>
     <string name="action_no_task">Normal</string>
-    <string name="neural_url">http://192.168.0.16:3000</string>
+    <string name="neural_url">http://192.168.0.11:3000</string>
 </resources>

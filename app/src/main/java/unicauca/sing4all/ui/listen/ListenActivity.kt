@@ -24,6 +24,7 @@ import com.jakewharton.rxbinding2.widget.textChanges
 import io.reactivex.Observable
 import io.reactivex.disposables.Disposable
 import io.reactivex.rxkotlin.subscribeBy
+import io.reactivex.rxkotlin.toObservable
 import kotlinx.android.synthetic.main.activity_connection_acvitivity.*
 import kotlinx.android.synthetic.main.activity_listen.*
 import org.jetbrains.anko.toast
@@ -32,14 +33,17 @@ import unicauca.sing4all.Manifest
 import unicauca.sing4all.R
 import unicauca.sing4all.databinding.ActivityListenBinding
 import unicauca.sing4all.di.Injectable
+import unicauca.sing4all.quantifier.Hand
 import unicauca.sing4all.ui.adapter.WordListenAdapter
 import unicauca.sing4all.util.LifeDisposable
+import unicauca.sing4all.util.applySchedulers
 import unicauca.sing4all.util.buildViewModel
 import java.io.IOException
 import java.io.InputStream
 import java.io.OutputStream
 import java.io.UnsupportedEncodingException
 import java.util.*
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 class ListenActivity : AppCompatActivity(), Injectable {
@@ -62,6 +66,7 @@ class ListenActivity : AppCompatActivity(), Injectable {
     var uxDis: Disposable? = null
 
     var testing = false
+    var listen = false
 
     lateinit var binding: ActivityListenBinding
 
@@ -145,9 +150,20 @@ class ListenActivity : AppCompatActivity(), Injectable {
             override fun handleMessage(msg: android.os.Message) {
                 if (msg.what == MESSAGE_READ) {
                     var readMessage: String? = null
+                    var sensorValues : List<String> = emptyList()
+
                     try {
                         readMessage = String(msg.obj as ByteArray, Charsets.UTF_8)
-                        Log.e("Datos",readMessage)
+                        sensorValues = readMessage.split(";")
+                        var menique =  sensorValues[0].toInt()
+                        var anular = sensorValues[1].toInt()
+                        var medio = sensorValues[2].toInt()
+                        var indice = sensorValues[3].toInt()
+                        var pulgar = sensorValues[4].toInt()
+                        var hand:Hand = Hand(menique,anular,medio,indice,pulgar)
+                     //       toast(""+menique)
+                        if (listen){
+                        if(!testing) runListen(listOf(hand))}
                     } catch (e: UnsupportedEncodingException) {
                         e.printStackTrace()
                     }
@@ -218,12 +234,14 @@ class ListenActivity : AppCompatActivity(), Injectable {
 
         dis add btnPlay.clicks()
                 .subscribe {
+                    listen= true
                     binding.listen = true
                     if (testing) runUxTask()
                 }
 
         dis add btnStop.clicks()
                 .subscribe {
+                    listen=false
                     stopListen()
                     if (testing) stopUxTask()
                 }
@@ -272,9 +290,12 @@ class ListenActivity : AppCompatActivity(), Injectable {
                 .map { word }
                 .flatMapSingle(viewModel::queryWords)
                 .subscribe {
+
                     adapter.data = it
                 }
     }
+
+
 
     fun stopUxTask() {
         uxDis?.dispose()
@@ -289,6 +310,25 @@ class ListenActivity : AppCompatActivity(), Injectable {
     }
 
 
+    fun getHand(btfingers:List<Hand>): Observable<Hand> = btfingers.toObservable()
+            .concatMap{i-> Observable.just(i).delay(2, TimeUnit.SECONDS)}
+            .applySchedulers()
+
+    fun runListen(fingers:List<Hand>) {
+        uxDis = getHand(fingers)
+                .flatMapSingle(viewModel::calculateLetter)
+                .filter { it.isNotEmpty() }
+                .doOnNext {
+                    word += it[0]
+                    binding.letters = it
+                }
+                .map { word }
+                .flatMapSingle(viewModel::queryWords)
+                .subscribe {
+                    adapter.data = it
+                    mConnectedThread!!.write("1")
+                }
+    }
 
 
 
@@ -337,7 +377,8 @@ class ListenActivity : AppCompatActivity(), Injectable {
                         buffer = ByteArray(1024)
                         SystemClock.sleep(100) //pause and wait for rest of data. Adjust this depending on your sending speed.
                         // how many bytes are ready to be read?
-                        bytes = mmInStream.read(buffer) // record how many bytes we actually read
+                        bytes = mmInStream.available() // how many bytes are ready to be read?
+                        bytes = mmInStream.read(buffer, 0, bytes) // record how many bytes we actually read
                         Log.d("Datos", bytes.toString() + "")
                         mHandler!!.obtainMessage(MESSAGE_READ, bytes, -1, buffer)
                                 .sendToTarget() // Send the obtained bytes to the UI activity
