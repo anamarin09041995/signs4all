@@ -266,6 +266,7 @@ class ListenActivity : AppCompatActivity(), Injectable {
                     word = word.replaceRange(word.lastIndex, word.length, binding.letters!![it])
                     sign.setText(word)
                     binding.letters = emptyList()
+                    textToSpeech.speak(binding.letters!![it], TextToSpeech.QUEUE_FLUSH, null, null)
                     word
                 }
                 .flatMapSingle(viewModel::queryWords)
@@ -285,6 +286,10 @@ class ListenActivity : AppCompatActivity(), Injectable {
                 .filter { it.isNotEmpty() }
                 .doOnNext {
                     word += it[0]
+                    // Solo dice la letra cuando es una opc, en caso contrario al seleccionar la opcion
+                    if(it.size == 1){
+                        textToSpeech.speak(it[0], TextToSpeech.QUEUE_FLUSH, null, null)
+                    }
                     binding.letters = it
                 }
                 .map { word }
